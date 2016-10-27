@@ -14,8 +14,6 @@ import (
 type Server struct {
 	Handler http.Handler
 	Opts    *Options
-
-	m *letsencrypt.Manager
 }
 
 func (s *Server) ListenAndServe() {
