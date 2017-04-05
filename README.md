@@ -157,6 +157,7 @@ An example [oauth2_proxy.cfg](contrib/oauth2_proxy.cfg.example) config file is i
 
 ```
 Usage of oauth2_proxy:
+<<<<<<< HEAD
   -approval-prompt string: OAuth approval_prompt (default "force")
   -authenticated-emails-file string: authenticate against emails via file (one per line)
   -azure-tenant string: go to a tenant-specific or common (tenant-independent) endpoint. (default "common")
@@ -201,6 +202,53 @@ Usage of oauth2_proxy:
   -skip-auth-preflight: will skip authentication for OPTIONS requests
   -skip-auth-regex value: bypass authentication for requests path's that match (may be given multiple times)
   -skip-provider-button: will skip sign-in-page to directly reach the next step: oauth/start
+=======
+  -approval-prompt="force": Oauth approval_prompt
+  -authenticated-emails-file="": authenticate against emails via file (one per line)
+  -azure-tenant="common": go to a tenant-specific or common (tenant-independent) endpoint.
+  -basic-auth-password="": the password to set when passing the HTTP Basic Auth header
+  -client-id="": the OAuth Client ID: ie: "123456.apps.googleusercontent.com"
+  -client-secret="": the OAuth Client Secret
+  -config="": path to config file
+  -cookie-domain="": an optional cookie domain to force cookies to (ie: .yourcompany.com)*
+  -cookie-expire=168h0m0s: expire timeframe for cookie
+  -cookie-httponly=true: set HttpOnly cookie flag
+  -cookie-name="_oauth2_proxy": the name of the cookie that the oauth_proxy creates
+  -cookie-refresh=0: refresh the cookie after this duration; 0 to disable
+  -cookie-secret="": the seed string for secure cookies
+  -cookie-secure=true: set secure (HTTPS) cookie flag
+  -custom-templates-dir="": path to custom html templates
+  -display-htpasswd-form=true: display username / password login form if an htpasswd file is provided
+  -email-domain=: authenticate emails with the specified domain (may be given multiple times). Use * to authenticate any email
+  -github-org="": restrict logins to members of this organisation
+  -github-team="": restrict logins to members of this team
+  -google-admin-email="": the google admin to impersonate for api calls
+  -google-group=: restrict logins to members of this google group (may be given multiple times).
+  -google-service-account-json="": the path to the service account json credentials
+  -htpasswd-file="": additionally authenticate against a htpasswd file. Entries must be created with "htpasswd -s" for SHA encryption
+  -http-address="127.0.0.1:4180": [http://]<addr>:<port> or unix://<path> to listen on for HTTP clients
+  -https-address=":443": <addr>:<port> to listen on for HTTPS clients
+  -login-url="": Authentication endpoint
+  -letsencrypt-admin-email="": admin contact email; sent to Let's Encrypt during registration
+  -letsencrypt-cache-dir="./": Let's Encrypt certificate cache directory
+  -letsencrypt-enabled=false: Use Let's Encrypt ACME certificates
+  -letsencrypt-host="": Obtain TLS certificates for this domain with Let's Encrypt (may be given multiple times)
+  -pass-access-token=false: pass OAuth access_token to upstream via X-Forwarded-Access-Token header
+  -pass-basic-auth=true: pass HTTP Basic Auth, X-Forwarded-User and X-Forwarded-Email information to upstream
+  -pass-user-headers=true: pass X-Forwarded-User and X-Forwarded-Email information to upstream
+  -pass-host-header=true: pass the request Host Header to upstream
+  -profile-url="": Profile access endpoint
+  -provider="google": OAuth provider
+  -proxy-prefix="/oauth2": the url root path that this proxy should be nested under (e.g. /<oauth2>/sign_in)
+  -redeem-url="": Token redemption endpoint
+  -redirect-url="": the OAuth Redirect URL. ie: "https://internalapp.yourcompany.com/oauth2/callback"
+  -resource="": the resource that is being protected. ie: "https://graph.windows.net". Currently only used in the Azure provider.
+  -request-logging=true: Log requests to stdout
+  -scope="": Oauth scope specification
+  -signature-key="": GAP-Signature request signature key (algorithm:secretkey)
+  -skip-auth-regex=: bypass authentication for requests path's that match (may be given multiple times)
+  -skip-provider-button=false: will skip sign-in-page to directly reach the next step: oauth/start
+>>>>>>> Add support for Let's Encrypt certificates
   -ssl-insecure-skip-verify: skip validation of certificates presented when using HTTPS
   -tls-cert string: path to certificate file
   -tls-key string: path to private key file
@@ -232,11 +280,11 @@ The following environment variables can be used in place of the corresponding co
 - `OAUTH2_PROXY_COOKIE_REFRESH`
 - `OAUTH2_PROXY_SIGNATURE_KEY`
 
-## SSL Configuration
+## TLS Configuration
 
-There are two recommended configurations.
+There are three recommended configurations.
 
-1) Configure SSL Terminiation with OAuth2 Proxy by providing a `--tls-cert=/path/to/cert.pem` and `--tls-key=/path/to/cert.key`.
+1) Configure TLS Terminiation with OAuth2 Proxy by providing a `--tls-cert=/path/to/cert.pem` and `--tls-key=/path/to/cert.key`.
 
 The command line to run `oauth2_proxy` in this configuration would look like this:
 
@@ -253,18 +301,39 @@ The command line to run `oauth2_proxy` in this configuration would look like thi
    --client-secret=...
 ```
 
+2) Configure TLS Termination with OAuth2 Proxy via Let's Encrypt ACME certificates.
 
-2) Configure SSL Termination with [Nginx](http://nginx.org/) (example config below), Amazon ELB, Google Cloud Platform Load Balancing, or ....
+To use Let's Encrypt certificates you must set three configuration
+options: Enable Let's Encrypt, provide an administrative contact
+email and declare the domain(s) you would like a certificate for.
+
+For this to work the oauth2_proxy process must be listening on a socket
+reachable via this domain name. Specifically, Let's Encrypt will
+provide TLS SNI challenges to the proxy before signing a certificate.
+See the [ACME specification](https://tools.ietf.org/html/draft-ietf-acme-acme-04#section-7.3)
+for more details.
+
+```bash
+./ouath2_proxy \
+    --letsencrypt-enabled=true \
+    --letsencrypt-admin-email=admin@example.com \
+    --letsencrypt-host=your.domain.example.com \
+    ... # other options...
+```
+
+Note that you cannot enable Let's Encrypt and define `--tls-cert` or `--tls-key`.
+
+3) Configure TLS Termination with [Nginx](http://nginx.org/) (example config below), Amazon ELB, Google Cloud Platform Load Balancing, or ....
 
 Because `oauth2_proxy` listens on `127.0.0.1:4180` by default, to listen on all interfaces (needed when using an
 external load balancer like Amazon ELB or Google Platform Load Balancing) use `--http-address="0.0.0.0:4180"` or
 `--http-address="http://:4180"`.
 
-Nginx will listen on port `443` and handle SSL connections while proxying to `oauth2_proxy` on port `4180`.
+Nginx will listen on port `443` and handle TLS connections while proxying to `oauth2_proxy` on port `4180`.
 `oauth2_proxy` will then authenticate requests for an upstream application. The external endpoint for this example
 would be `https://internal.yourcompany.com/`.
 
-An example Nginx config follows. Note the use of `Strict-Transport-Security` header to pin requests to SSL
+An example Nginx config follows. Note the use of `Strict-Transport-Security` header to pin requests to TLS 
 via [HSTS](http://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security):
 
 ```
