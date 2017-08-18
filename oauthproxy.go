@@ -134,8 +134,9 @@ func NewOAuthProxy(opts *Options, validator func(string) bool) *OAuthProxy {
 			} else {
 				setProxyDirector(proxy)
 			}
+			ws := newWebsocketHandler(u, proxy)
 			serveMux.Handle(path,
-				&UpstreamProxy{u.Host, proxy, auth})
+				&UpstreamProxy{u.Host, ws, auth})
 		case "file":
 			if u.Fragment != "" {
 				path = u.Fragment
