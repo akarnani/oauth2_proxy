@@ -4,6 +4,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"net"
@@ -62,6 +63,10 @@ func (l *responseLogger) Status() int {
 
 func (l *responseLogger) Size() int {
 	return l.size
+}
+
+func (l *responseLogger) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	return l.w.(http.Hijacker).Hijack()
 }
 
 // loggingHandler is the http.Handler implementation for LoggingHandlerTo and its friends

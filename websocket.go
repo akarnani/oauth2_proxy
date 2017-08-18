@@ -27,7 +27,17 @@ func isWebsocket(req *http.Request) bool {
 }
 
 func newWebsocketHandler(target *url.URL, alternative http.Handler) http.Handler {
-	ws := websocketproxy.NewProxy(target)
+	u := *target
+	if target.Scheme == "https" {
+		u.Scheme = "wss"
+	} else {
+		u.Scheme = "ws"
+	}
+	ws := websocketproxy.NewProxy(&u)
+
+	websocketproxy.DefaultUpgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isWebsocket(r) {
