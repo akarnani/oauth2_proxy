@@ -35,10 +35,6 @@ func newWebsocketHandler(target *url.URL, alternative http.Handler) http.Handler
 	}
 	ws := websocketproxy.NewProxy(&u)
 
-	websocketproxy.DefaultUpgrader.CheckOrigin = func(r *http.Request) bool {
-		return true
-	}
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isWebsocket(r) {
 			ws.ServeHTTP(w, r)
