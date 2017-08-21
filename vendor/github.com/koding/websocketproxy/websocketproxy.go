@@ -2,7 +2,6 @@
 package websocketproxy
 
 import (
-	"io"
 	"log"
 	"net"
 	"net/http"
@@ -166,13 +165,24 @@ func (w *WebsocketProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	defer connPub.Close()
 
 	errc := make(chan error, 2)
-	cp := func(dst io.Writer, src io.Reader) {
-		_, err := io.Copy(dst, src)
-		errc <- err
+	cp := func(dst *websocket.Conn, src *websocket.Conn) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("websocketproxy: got error %s\n", err)
+			}
+		}()
+		var e error
+		for e == nil {
+			t, msg, err := src.ReadMessage()
+			e = err
+			dst.WriteMessage(t, msg)
+		}
+		errc <- e
 	}
 
 	// Start our proxy now, everything is ready...
-	go cp(connBackend.UnderlyingConn(), connPub.UnderlyingConn())
-	go cp(connPub.UnderlyingConn(), connBackend.UnderlyingConn())
-	<-errc
+	go cp(connBackend, connPub)
+	go cp(connPub, connBackend)
+	log.Printf("websocketproxy: error %s\n", <-errc)
+
 }
