@@ -31,6 +31,7 @@ type Options struct {
 	LetsEncryptHosts      []string `flag:"letsencrypt-host" cfg:"letsencrypt_hosts"`
 	LetsEncryptCacheDir   string   `flag:"letsencrypt-cache-dir" cfg:"letsencrypt_cache_dir"`
 	LetsEncryptAdminEmail string   `flag:"letsencrypt-admin-email" cfg:"letsencrypt_admin_email"`
+	LetsEncryptAddress    string   `flag:"letsencrypt-address" cfg:"letsencrypt_address"`
 
 	AuthenticatedEmailsFile  string   `flag:"authenticated-emails-file" cfg:"authenticated_emails_file"`
 	AzureTenant              string   `flag:"azure-tenant" cfg:"azure_tenant"`

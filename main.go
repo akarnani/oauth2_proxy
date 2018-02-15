@@ -35,6 +35,7 @@ func main() {
 	flagSet.String("letsencrypt-admin-email", "", "Admin contact email; sent to Let's Encrypt during registration during registration")
 	flagSet.Var(&letsEncryptHosts, "letsencrypt-host", "Obtain TLS certificates for this domain with Let's Encrypt (may be given multiple times)")
 	flagSet.String("letsencrypt-cache-dir", "./", "Let's Encrypt certificate cache directory")
+	flagSet.String("letsencrypt-address", ":80", "Address to listen for a HTTP domain validation.  Redirects all other requests to https")
 
 	flagSet.String("redirect-url", "", "the OAuth Redirect URL. ie: \"https://internalapp.yourcompany.com/oauth2/callback\"")
 	flagSet.Bool("set-xauthrequest", false, "set X-Auth-Request-User and X-Auth-Request-Email response headers (useful in Nginx auth_request mode)")

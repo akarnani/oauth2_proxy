@@ -87,10 +87,10 @@
 			"revisionTime": "2017-08-07T10:11:13Z"
 		},
 		{
-			"checksumSHA1": "TrKJW+flz7JulXU3sqnBJjGzgQc=",
+			"checksumSHA1": "gC6AcM8gjkOtHitWlmtSXezLv9w=",
 			"path": "golang.org/x/crypto/acme/autocert",
-			"revision": "eb71ad9bd329b5ac0fd0148dd99bd62e8be8e035",
-			"revisionTime": "2017-08-07T10:11:13Z"
+			"revision": "650f4a345ab4e5b245a3034b110ebc7299e68186",
+			"revisionTime": "2017-09-27T09:16:38Z"
 		},
 		{
 			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",

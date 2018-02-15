@@ -80,6 +80,10 @@ func (s *Server) ServeHTTPS() {
 			manager.Email = s.Opts.LetsEncryptAdminEmail
 		}
 		config.GetCertificate = manager.GetCertificate
+
+		if s.Opts.LetsEncryptAddress != "" {
+			go http.ListenAndServe(s.Opts.LetsEncryptAddress, manager.HTTPHandler(redirect{}))
+		}
 	} else {
 		var err error
 		config.Certificates = make([]tls.Certificate, 1)
